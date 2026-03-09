@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: latent-nexus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexus_admin
+      POSTGRES_PASSWORD: nexus_password
+      POSTGRES_DB: latent_nexus
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nexus-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    container_name: latent-nexus-iam
+    command: start-dev
+    environment:
+      # Wire Keycloak to use our PostgreSQL container for its own storage
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/latent_nexus
+      KC_DB_USERNAME: nexus_admin
+      KC_DB_PASSWORD: nexus_password
+      # Bootstrap Admin User
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - nexus-network
+
+networks:
+  nexus-network:
+    driver: bridge
+
+volumes:
+  # Named volume to ensure your database data survives container destruction
+  postgres_data:

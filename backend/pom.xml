@@ -61,12 +61,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-        <!-- Removed explicit flyway-database-postgresql dependency as it's managed by Spring Boot or included in flyway-core for newer versions,
-             but if needed, it should have a version. Spring Boot 3.2.x manages Flyway 9.x which includes postgres support in core,
-             or if using Flyway 10+, it needs the separate dependency.
-             Spring Boot 3.2.1 manages Flyway 9.22.3 by default.
-             Flyway 9.x includes PostgreSQL support in flyway-core.
-             So we can remove flyway-database-postgresql. -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
