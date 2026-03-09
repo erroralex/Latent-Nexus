@@ -12,11 +12,27 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Base class for all JPA entities in the Latent Nexus application.
+ * Abstract base class for all JPA entities within the Latent Nexus application.
  * <p>
- * This abstract class provides common fields such as a unique identifier (UUID),
- * creation timestamp, and last update timestamp. It uses JPA lifecycle callbacks
- * ({@link PrePersist} and {@link PreUpdate}) to automatically manage the timestamps.
+ * This class provides a common foundation for persistent entities, encapsulating
+ * audit-related fields that are typically present in most database tables.
+ * It automatically manages the generation of a unique identifier (UUID) and
+ * tracks the creation and last update timestamps for each entity.
+ * </p>
+ * <p>
+ * Key features include:
+ * <ul>
+ *     <li>**UUID Primary Key:** A universally unique identifier (`id`) is generated
+ *         automatically upon entity persistence, ensuring uniqueness across distributed systems.</li>
+ *     <li>**Creation Timestamp (`createdAt`):** Records the exact moment an entity
+ *         was first persisted. This field is set automatically during the `PrePersist`
+ *         lifecycle event and is immutable thereafter.</li>
+ *     <li>**Update Timestamp (`updatedAt`):** Records the last moment an entity
+ *         was modified. This field is updated automatically during both `PrePersist`
+ *         and `PreUpdate` lifecycle events.</li>
+ * </ul>
+ * The timestamps are managed using JPA lifecycle callbacks (`@PrePersist` and `@PreUpdate`),
+ * ensuring consistency and reducing boilerplate code in subclasses.
  * </p>
  */
 @MappedSuperclass

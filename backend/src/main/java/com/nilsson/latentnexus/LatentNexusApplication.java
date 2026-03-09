@@ -12,9 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * </p>
  */
 @SpringBootApplication
-public class LatentNexusApplication {
-
-    /**
+public class LatentNexusApplication {    /**
      * Main method to launch the Spring Boot application.
      *
      * @param args
@@ -23,5 +21,4 @@ public class LatentNexusApplication {
     public static void main(String[] args) {
         SpringApplication.run(LatentNexusApplication.class, args);
     }
-
 }

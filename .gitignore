@@ -1,34 +1,57 @@
-### Build Outputs ###
+### Latent Nexus Master Gitignore ###
+
+# --- Build Outputs ---
+# Ignore all compiled Java classes and Vite distribution builds
 backend/target/
 frontend/dist/
-!**/src/main/**/target/
-!**/src/test/**/target/
+out/
+bin/
 
-### Maven ###
+# --- Secrets & Local Config (CRITICAL) ---
+# Prevents accidental leaks of Gemini API keys or Keycloak secrets
+.env
+*.env.local
+.env.*
+**/application-local.yaml
+**/application-local.properties
+backend/src/main/resources/application-local.yaml
+
+# Ignore IntelliJ's local-only data which might contain passwords
+.idea/dataSources/
+.idea/dataSources.local.xml
+
+# --- Maven ---
+# Maven wrapper and release artifacts
 .mvn/wrapper/maven-wrapper.jar
 backend/HELP.md
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/release.properties
 
-### Frontend (Node / Vite) ###
+# --- Frontend (Node / Vite) ---
+# Dependencies and local environment overrides
 frontend/node_modules/
 frontend/.vite/
 frontend/*.local
 frontend/.env
 frontend/.env.*.local
-npm-debug.log
-yarn-error.log
-pnpm-debug.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-### IntelliJ IDEA ###
+# --- IntelliJ IDEA ---
+# Keeps your workspace clean but allows sharing run configurations if needed
 .idea/
 *.iws
 *.iml
 *.ipr
-out/
 
-### VS Code ###
+# If you want to share specific run configs, un-comment the line below:
+# !.idea/runConfigurations/
+
+# --- VS Code / Eclipse / Other IDEs ---
 .vscode/
-
-### STS / Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -36,15 +59,11 @@ out/
 .settings
 .springBeans
 .sts4-cache
-
-### NetBeans ###
 /nbproject/private/
 /nbbuild/
-/dist/
-/nbdist/
 /.nb-gradle/
 
-### OS Generated Files ###
+# --- OS Generated Files ---
 .DS_Store
 .DS_Store?
 ._*
@@ -53,5 +72,12 @@ out/
 ehthumbs.db
 Thumbs.db
 
-### Local Docker Data (Optional, if you ever use bind mounts) ###
-docker/data/
+# --- Local Docker & Storage Data ---
+# Prevents committing multi-GB local databases or uploaded AI images
+**/docker/data/
+
+# If your local S3 (MinIO) stores data in a local folder:
+**/minio/data/
+
+# General Vault storage if using local file system
+**/vault/

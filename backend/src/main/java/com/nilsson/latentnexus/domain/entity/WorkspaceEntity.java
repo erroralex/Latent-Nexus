@@ -7,8 +7,20 @@ import jakarta.persistence.Table;
 /**
  * Represents a logical workspace within the Latent Nexus application.
  * <p>
- * Workspaces are used to group related assets and prompts. Each workspace
- * has a unique name and an optional description.
+ * Workspaces serve as the primary organizational unit for users to manage and
+ * isolate their AI-generated assets and prompts. Each workspace is uniquely
+ * identified and provides a dedicated context for data storage and access.
+ * </p>
+ * <p>
+ * Key attributes of a workspace include:
+ * <ul>
+ *     <li>**Name:** A unique, human-readable identifier for the workspace. This name
+ *         must be unique across all workspaces in the system.</li>
+ *     <li>**Description:** An optional, longer text providing more details about
+ *         the purpose or contents of the workspace.</li>
+ * </ul>
+ * As a subclass of {@link BaseEntity}, `WorkspaceEntity` automatically inherits
+ * `id`, `createdAt`, and `updatedAt` fields, providing essential auditing information.
  * </p>
  */
 @Entity

@@ -1,6 +1,7 @@
 package com.nilsson.latentnexus.service.metadata.strategy;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ import java.util.regex.Pattern;
  * parameters such as Steps, Sampler, CFG, and Seed. It also includes logic for extracting
  * LoRA tags and strengths directly from the prompt text and resolving dimensions.
  * </p>
+ * <p>
+ * The strategy acts as a fallback for many common AI generation tools that adhere to the 
+ * "Prompt\nNegative prompt:\nSteps:" convention.
+ * </p>
  */
 @Service
 public class CommonStrategy implements MetadataStrategy {
@@ -25,7 +30,7 @@ public class CommonStrategy implements MetadataStrategy {
     private static final Logger log = LoggerFactory.getLogger(CommonStrategy.class);
 
     @Override
-    public Map<String, Object> parse(String text) {
+    public Map<String, Object> parse(String text, ObjectMapper mapper) {
         if (text == null || text.isBlank()) {
             return new HashMap<>();
         }

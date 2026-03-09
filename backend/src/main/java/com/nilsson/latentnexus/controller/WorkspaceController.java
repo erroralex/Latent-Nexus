@@ -13,10 +13,19 @@ import java.util.UUID;
 /**
  * REST controller for managing logical workspaces within the Latent Nexus application.
  * <p>
- * This controller provides endpoints for creating, retrieving, and listing workspaces.
- * Workspaces serve as the primary organizational unit for grouping AI-generated assets
- * and prompts. Access to these endpoints is controlled via Spring Security, with
- * specific roles required for different operations (e.g., 'ADMIN' for creation).
+ * This class provides a set of RESTful endpoints for performing CRUD (Create, Read, Update, Delete)
+ * operations on {@link WorkspaceEntity} objects. Workspaces serve as the fundamental
+ * organizational unit within the application, allowing users to group and manage
+ * their AI-generated assets and prompts in isolated environments.
+ * </p>
+ * <p>
+ * Access to these endpoints is secured using Spring Security's `@PreAuthorize` annotations,
+ * enforcing role-based access control. For instance, creating a new workspace might
+ * be restricted to 'ADMIN' users, while viewing workspaces could be available to both 'USER' and 'ADMIN' roles.
+ * </p>
+ * <p>
+ * The controller interacts with the `WorkspaceService` to perform business logic
+ * and data persistence operations, ensuring a clean separation of concerns.
  * </p>
  */
 @RestController
@@ -29,25 +38,12 @@ public class WorkspaceController {
         this.workspaceService = workspaceService;
     }
 
-    /**
-     * Retrieves a list of all available workspaces.
-     *
-     * @return a list of {@link WorkspaceEntity} objects
-     */
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<WorkspaceEntity> getAllWorkspaces() {
         return workspaceService.getAllWorkspaces();
     }
 
-    /**
-     * Creates a new workspace.
-     *
-     * @param workspace
-     *         the workspace entity containing the name and description
-     *
-     * @return a {@link ResponseEntity} containing the created {@link WorkspaceEntity}
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<WorkspaceEntity> createWorkspace(@RequestBody WorkspaceEntity workspace) {
@@ -55,14 +51,6 @@ public class WorkspaceController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    /**
-     * Retrieves a specific workspace by its unique identifier.
-     *
-     * @param id
-     *         the UUID of the workspace to retrieve
-     *
-     * @return a {@link ResponseEntity} containing the {@link WorkspaceEntity}, or a 404 Not Found response
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<WorkspaceEntity> getWorkspace(@PathVariable UUID id) {

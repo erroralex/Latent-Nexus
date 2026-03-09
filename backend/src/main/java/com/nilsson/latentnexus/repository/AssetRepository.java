@@ -8,63 +8,39 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repository interface for {@link AssetEntity} operations.
+ * Repository interface for {@link AssetEntity} persistence operations.
  * <p>
- * This repository provides methods for managing AI-generated assets, including
- * finding assets by workspace and file hash, and retrieving assets for a specific
- * workspace with pagination. It also includes a native PostgreSQL query for
- * searching within the JSONB 'generation_metadata' column.
+ * This repository provides specialized data access methods for AI-generated assets, 
+ * including workspace-scoped queries, deduplication checks via file hashes, and 
+ * advanced JSONB metadata filtering.
+ * </p>
+ * <p>
+ * It leverages Spring Data JPA for standard CRUD operations and incorporates 
+ * custom JPQL and native PostgreSQL queries to handle complex requirements like 
+ * cursor-based pagination and deep JSON metadata searches.
  * </p>
  */
 @Repository
 public interface AssetRepository extends JpaRepository<AssetEntity, UUID> {
 
-    /**
-     * Finds an asset by its workspace ID and file hash.
-     *
-     * @param workspaceId
-     *         the ID of the workspace
-     * @param fileHash
-     *         the SHA-256 hash of the file
-     *
-     * @return an {@link Optional} containing the found asset, or empty if not found
-     */
     Optional<AssetEntity> findByWorkspaceIdAndFileHash(UUID workspaceId, String fileHash);
 
-    /**
-     * Retrieves all assets for a given workspace with pagination.
-     *
-     * @param workspaceId
-     *         the ID of the workspace
-     * @param pageable
-     *         the pagination information
-     *
-     * @return a {@link Page} of assets
-     */
     Page<AssetEntity> findByWorkspaceId(UUID workspaceId, Pageable pageable);
 
-    /**
-     * Searches for assets within a workspace based on a key-value pair in the generation metadata.
-     *
-     * @param workspaceId
-     *         the ID of the workspace
-     * @param jsonKey
-     *         the key within the JSONB metadata
-     * @param jsonValue
-     *         the value to match
-     * @param pageable
-     *         the pagination information
-     *
-     * @return a {@link Page} of matching assets
-     */
+    @Query("SELECT a FROM AssetEntity a WHERE a.workspace.id = :workspaceId AND a.createdAt < :cursor ORDER BY a.createdAt DESC")
+    Page<AssetEntity> findByWorkspaceIdAndCreatedAtBefore(@Param("workspaceId") UUID workspaceId, @Param("cursor") Instant cursor, Pageable pageable);
+
+    Optional<AssetEntity> findByIdAndWorkspaceId(UUID assetId, UUID workspaceId);
+
     @Query(value = """
             SELECT * FROM assets a 
             WHERE a.workspace_id = :workspaceId 
-            AND a.generation_metadata ->> :jsonKey = :jsonValue
+            AND a.generation_metadata ->> :jsonKey ILIKE %:jsonValue%
             """,
             nativeQuery = true)
     Page<AssetEntity> findByMetadataKeyValue(

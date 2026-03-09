@@ -18,15 +18,18 @@ import java.util.Map;
  * and prompts, mapping SwarmUI-specific keys (e.g., "cfgscale", "negativeprompt")
  * to standard application fields.
  * </p>
+ * <p>
+ * The strategy specifically looks for the `sui_image_params` root key and handles
+ * the extraction of LoRA information from parallel arrays of names and weights.
+ * </p>
  */
 @Service
 public class SwarmUIStrategy implements MetadataStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(SwarmUIStrategy.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public Map<String, Object> parse(String text) {
+    public Map<String, Object> parse(String text, ObjectMapper mapper) {
         if (text == null || text.isBlank()) {
             return new HashMap<>();
         }

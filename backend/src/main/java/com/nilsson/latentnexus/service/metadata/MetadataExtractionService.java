@@ -23,6 +23,11 @@ import java.util.*;
  * for dimensions and {@link ImageMetadataReader} to find metadata chunks
  * embedded in the file, which are then parsed by {@link TextParamsParser}.
  * </p>
+ * <p>
+ * The service implements a scoring mechanism to identify the most relevant
+ * metadata chunk from multiple candidates, ensuring that the most complete
+ * generation data (e.g., prompts, seeds, samplers) is prioritized.
+ * </p>
  */
 @Service
 public class MetadataExtractionService {
@@ -34,12 +39,6 @@ public class MetadataExtractionService {
         this.textParamsParser = textParamsParser;
     }
 
-    /**
-     * Extracts physical dimensions and AI generation metadata from an uploaded file.
-     *
-     * @param file the multipart file to process
-     * @return a map containing extracted metadata and physical attributes
-     */
     public Map<String, Object> extractDataFromUpload(MultipartFile file) {
         Map<String, Object> results = new HashMap<>();
 

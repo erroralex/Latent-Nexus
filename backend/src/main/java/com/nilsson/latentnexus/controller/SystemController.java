@@ -12,10 +12,15 @@ import java.util.Map;
 /**
  * REST controller for system-level operations and health checks.
  * <p>
- * This controller provides endpoints to monitor the health of the backend
- * infrastructure, including connectivity to the PostgreSQL database and
- * the Keycloak authentication server. The health check endpoint is
- * publicly accessible.
+ * This class provides endpoints to monitor the operational status and connectivity of the
+ * Latent Nexus backend's critical infrastructure components. It offers a publicly
+ * accessible health check endpoint that verifies the reachability and basic functionality
+ * of the PostgreSQL database and the Keycloak authentication server.
+ * </p>
+ * <p>
+ * The primary purpose of this controller is to provide a quick and reliable way
+ * for external monitoring systems or load balancers to ascertain the health
+ * of the application instance.
  * </p>
  */
 @RestController
@@ -31,9 +36,14 @@ public class SystemController {
     }
 
     /**
-     * Checks the health of the backend infrastructure.
+     * Performs a health check of the backend's critical dependencies.
+     * <p>
+     * This method attempts to connect to the configured PostgreSQL database and
+     * the Keycloak authentication server to verify their operational status.
+     * </p>
      *
-     * @return a map containing the health status of the database, Keycloak, and backend
+     * @return a map containing the health status ("UP" or "DOWN" with an error message)
+     * for the database, Keycloak, and the overall backend service.
      */
     @GetMapping("/health")
     public Map<String, String> getHealth() {

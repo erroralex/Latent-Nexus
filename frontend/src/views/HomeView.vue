@@ -1,3 +1,12 @@
+<!--
+  Home view component for the Latent Nexus application.
+
+  This component serves as the landing page for authenticated users. It displays
+  a hero section with the application's branding, a welcome message for the
+  logged-in user, and navigation buttons to enter the asset registry or sign out.
+  It also highlights the key features of the platform, such as the secure vault,
+  metadata indexing, and multi-tenancy support.
+-->
 <script setup>
 import {useAuthStore} from '@/stores/authStore';
 import {useRouter} from 'vue-router';

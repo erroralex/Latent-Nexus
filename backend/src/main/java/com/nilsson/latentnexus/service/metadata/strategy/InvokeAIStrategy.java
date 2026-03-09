@@ -17,15 +17,18 @@ import java.util.Map;
  * It maps InvokeAI-specific keys (e.g., "model_name", "positive_prompt", "cfg_scale")
  * to the application's standard metadata schema.
  * </p>
+ * <p>
+ * The strategy handles both direct JSON parsing and incremental extraction of
+ * individual fields from the InvokeAI metadata block.
+ * </p>
  */
 @Service
 public class InvokeAIStrategy implements MetadataStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(InvokeAIStrategy.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public Map<String, Object> parse(String text) {
+    public Map<String, Object> parse(String text, ObjectMapper mapper) {
         if (text == null || text.isBlank()) {
             return new HashMap<>();
         }
