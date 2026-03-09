@@ -1,10 +1,34 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+### Build Outputs ###
+backend/target/
+frontend/dist/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+### Maven ###
+.mvn/wrapper/maven-wrapper.jar
+backend/HELP.md
+
+### Frontend (Node / Vite) ###
+frontend/node_modules/
+frontend/.vite/
+frontend/*.local
+frontend/.env
+frontend/.env.*.local
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### VS Code ###
+.vscode/
+
+### STS / Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -13,27 +37,21 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+### OS Generated Files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-### Frontend ###
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
-frontend/*.local
+### Local Docker Data (Optional, if you ever use bind mounts) ###
+docker/data/

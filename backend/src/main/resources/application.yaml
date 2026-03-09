@@ -35,4 +35,4 @@ keycloak:
   realm: latent-nexus
   admin:
     client-id: latent-nexus-backend
-    client-secret: ${KEYCLOAK_CLIENT_SECRET}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET:admin_secret_here}
