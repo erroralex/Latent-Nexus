@@ -20,6 +20,10 @@ import java.util.regex.Pattern;
  * to identify core parameters (Steps, Seed, CFG, Sampler, Scheduler), prompts, models,
  * and LoRAs. It also handles custom nodes and embedded prompt tags.
  * </p>
+ * <p>
+ * The strategy is designed to be resilient to varying node names and custom node implementations
+ * by using keyword-based identification and recursive link resolution.
+ * </p>
  */
 @Service
 public class ComfyUIStrategy implements MetadataStrategy {

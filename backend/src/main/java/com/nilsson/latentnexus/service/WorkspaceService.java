@@ -10,12 +10,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Service for managing logical workspaces in the Latent Nexus application.
+ * Service class for managing logical workspaces.
  * <p>
- * This service provides the core business logic for creating, retrieving, and
- * deleting workspaces. It ensures that workspace names are unique and manages
- * the persistence of workspace entities through the {@link WorkspaceRepository}.
- * All operations that modify the database are performed within a transactional context.
+ * This service provides the core business logic for the lifecycle of workspaces within the Latent Nexus application.
+ * Workspaces serve as the primary organizational unit for grouping AI-generated assets and prompts, providing
+ * a dedicated context for data storage and access.
+ * </p>
+ * <p>
+ * Key responsibilities include:
+ * <ul>
+ *     <li>Creating new workspaces while ensuring name uniqueness.</li>
+ *     <li>Retrieving individual workspaces by their unique identifier.</li>
+ *     <li>Listing all available workspaces in the system.</li>
+ *     <li>Managing the deletion of workspaces and their associated data.</li>
+ * </ul>
+ * All state-changing operations are executed within a transactional context to ensure data consistency.
  * </p>
  */
 @Service
@@ -27,40 +36,14 @@ public class WorkspaceService {
         this.workspaceRepository = workspaceRepository;
     }
 
-    /**
-     * Retrieves all workspaces available in the system.
-     *
-     * @return a list of all {@link WorkspaceEntity} objects
-     */
     public List<WorkspaceEntity> getAllWorkspaces() {
         return workspaceRepository.findAll();
     }
 
-    /**
-     * Finds a specific workspace by its unique ID.
-     *
-     * @param id
-     *         the UUID of the workspace to find
-     *
-     * @return an {@link Optional} containing the found workspace, or empty if not found
-     */
     public Optional<WorkspaceEntity> getWorkspaceById(UUID id) {
         return workspaceRepository.findById(id);
     }
 
-    /**
-     * Creates a new workspace with the given name and description.
-     *
-     * @param name
-     *         the unique name of the workspace
-     * @param description
-     *         an optional description of the workspace
-     *
-     * @return the saved {@link WorkspaceEntity}
-     *
-     * @throws RuntimeException
-     *         if a workspace with the same name already exists
-     */
     @Transactional
     public WorkspaceEntity createWorkspace(String name, String description) {
         if (workspaceRepository.existsByName(name)) {
@@ -71,12 +54,6 @@ public class WorkspaceService {
         return workspaceRepository.save(workspace);
     }
 
-    /**
-     * Deletes a workspace by its unique ID.
-     *
-     * @param id
-     *         the UUID of the workspace to delete
-     */
     @Transactional
     public void deleteWorkspace(UUID id) {
         workspaceRepository.deleteById(id);

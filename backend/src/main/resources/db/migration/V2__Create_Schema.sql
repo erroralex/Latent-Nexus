@@ -1,8 +1,15 @@
--- V2: Initial Enterprise Schema for Latent Nexus
+-- V2: Initial Consolidated Enterprise Schema for Latent Nexus
 -- Engineered for PostgreSQL 16+
 
 -------------------------------------------------------------------------------
--- 1. WORKSPACES
+-- 1. EXTENSIONS
+-------------------------------------------------------------------------------
+-- V4: Enable pgvector extension
+CREATE
+EXTENSION IF NOT EXISTS vector;
+
+-------------------------------------------------------------------------------
+-- 2. WORKSPACES
 -------------------------------------------------------------------------------
 CREATE TABLE workspaces
 (
@@ -14,7 +21,7 @@ CREATE TABLE workspaces
 );
 
 -------------------------------------------------------------------------------
--- 2. PROMPTS
+-- 3. PROMPTS
 -------------------------------------------------------------------------------
 CREATE TABLE prompts
 (
@@ -38,7 +45,7 @@ CREATE TABLE prompts
 CREATE INDEX idx_prompts_workspace_id ON prompts (workspace_id);
 
 -------------------------------------------------------------------------------
--- 3. ASSETS (Images & Workflows)
+-- 4. ASSETS (Images & Workflows)
 -------------------------------------------------------------------------------
 CREATE TABLE assets
 (
@@ -50,7 +57,7 @@ CREATE TABLE assets
     storage_path        VARCHAR(255)             NOT NULL,
     workspace_id        UUID                     NOT NULL,
 
-    -- New Standard File Properties
+    -- Standard File Properties
     mime_type           VARCHAR(100)             NOT NULL,
     file_size_bytes     BIGINT                   NOT NULL,
     width               INTEGER,
@@ -58,6 +65,9 @@ CREATE TABLE assets
 
     -- The JSONB column for ComfyUI/Stable Diffusion metadata
     generation_metadata JSONB,
+
+    -- V5: Add embedding column for semantic search
+    embedding           vector(768),
 
     CONSTRAINT fk_assets_workspace
         FOREIGN KEY (workspace_id)
@@ -69,5 +79,9 @@ CREATE TABLE assets
 CREATE INDEX idx_assets_workspace_id ON assets (workspace_id);
 
 -- GIN INDEX (Generalized Inverted Index) for JSONB
--- This is the "secret sauce" that makes searching deeply nested JSON graphs instant
+-- This makes searching deeply nested JSON graphs instant
 CREATE INDEX idx_assets_metadata_gin ON assets USING GIN (generation_metadata);
+
+-- V3: Add targeted GIN index for tag-based searches
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_assets_tags_gin
+    ON assets USING GIN ((generation_metadata->'tags'));

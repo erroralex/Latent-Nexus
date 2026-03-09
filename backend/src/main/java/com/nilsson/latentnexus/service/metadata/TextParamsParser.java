@@ -1,7 +1,9 @@
 package com.nilsson.latentnexus.service.metadata;
 
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.nilsson.latentnexus.service.metadata.strategy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +21,20 @@ import java.util.Map;
  * It handles both structured JSON and unstructured text formats commonly used by
  * various AI image generation tools.
  * </p>
+ * <p>
+ * The parser uses a strategy-based approach to extract key generation parameters such as
+ * prompts, seeds, samplers, and model information, normalizing them into a consistent
+ * map structure for storage and search.
+ * </p>
  */
 @Service
 public class TextParamsParser {
 
     private static final Logger logger = LoggerFactory.getLogger(TextParamsParser.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = JsonMapper.builder()
+            .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
+            .build();
 
-    /**
-     * Parses the provided metadata text into a map of key-value pairs.
-     *
-     * @param text
-     *         the raw metadata text to parse
-     *
-     * @return a map containing the extracted metadata
-     */
     public Map<String, Object> parse(String text) {
         if (text == null || text.trim().isEmpty()) {
             return new HashMap<>();
@@ -46,7 +47,7 @@ public class TextParamsParser {
                 JsonNode root = mapper.readTree(trimmedText);
 
                 if (root.has("sui_image_params")) {
-                    return new SwarmUIStrategy().parse(trimmedText);
+                    return new SwarmUIStrategy().parse(trimmedText, mapper);
                 }
 
                 Map<String, Object> results = new HashMap<>();
@@ -90,19 +91,19 @@ public class TextParamsParser {
         }
 
         if (text.contains("Steps: ") && text.contains("Sampler: ")) {
-            return new CommonStrategy().parse(text);
+            return new CommonStrategy().parse(text, mapper);
         }
 
         if (text.contains("\"app_version\":") && text.contains("invokeai")) {
-            return new InvokeAIStrategy().parse(text);
+            return new InvokeAIStrategy().parse(text, mapper);
         }
 
         if (text.contains("NovelAI")) {
-            return new NovelAIStrategy().parse(text);
+            return new NovelAIStrategy().parse(text, mapper);
         }
 
         if (text.contains("sui_image_params")) {
-            return new SwarmUIStrategy().parse(text);
+            return new SwarmUIStrategy().parse(text, mapper);
         }
 
         return new HashMap<>();

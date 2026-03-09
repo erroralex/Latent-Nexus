@@ -8,32 +8,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repository interface for {@link WorkspaceEntity} operations.
+ * Repository interface for {@link WorkspaceEntity} persistence operations.
  * <p>
- * This repository provides methods for managing workspaces, including
- * finding a workspace by its unique name and checking for its existence.
+ * This repository manages the lifecycle of logical workspaces within the 
+ * Latent Nexus application. Workspaces serve as the primary organizational 
+ * unit for grouping AI-generated assets and prompts, providing a dedicated 
+ * context for data storage and access.
+ * </p>
+ * <p>
+ * Key functionalities include finding workspaces by their unique name and 
+ * checking for the existence of a workspace with a specific name.
  * </p>
  */
 @Repository
 public interface WorkspaceRepository extends JpaRepository<WorkspaceEntity, UUID> {
 
-    /**
-     * Finds a workspace by its unique name.
-     *
-     * @param name
-     *         the name of the workspace
-     *
-     * @return an {@link Optional} containing the found workspace, or empty if not found
-     */
     Optional<WorkspaceEntity> findByName(String name);
 
-    /**
-     * Checks if a workspace exists with the given name.
-     *
-     * @param name
-     *         the name of the workspace
-     *
-     * @return true if a workspace exists with the given name, false otherwise
-     */
     boolean existsByName(String name);
 }

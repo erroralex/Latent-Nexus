@@ -8,12 +8,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the Keycloak Admin Client.
+ * Configuration class for setting up and providing a Keycloak Admin Client.
  * <p>
- * This class provides a Spring {@link Bean} for the {@link Keycloak} admin client,
- * which is used to interact with the Keycloak server's administrative API.
- * It uses client credentials flow for authentication, with properties loaded
- * from the application configuration.
+ * This class is responsible for creating and configuring a Spring {@link Bean} of type
+ * {@link Keycloak}, which serves as the administrative client for interacting with the
+ * Keycloak server's REST API. This client is essential for performing administrative
+ * operations programmatically, such as managing users, roles, clients, or realms within Keycloak.
+ * </p>
+ * <p>
+ * The client is built using the `KeycloakBuilder` and is configured with details
+ * like the Keycloak server URL, the target realm, and the administrative client's
+ * ID and secret. These configuration values are injected from the application's
+ * properties (e.g., `application.yaml` or environment variables), ensuring
+ * flexibility and environment-specific deployments.
+ * </p>
+ * <p>
+ * Authentication for the admin client is performed using the `CLIENT_CREDENTIALS`
+ * grant type, which is suitable for server-to-server communication where the
+ * application itself acts as a client to Keycloak's administrative interface.
  * </p>
  */
 @Configuration
@@ -31,11 +43,6 @@ public class KeycloakAdminClientConfig {
     @Value("${keycloak.admin.client-secret}")
     private String adminClientSecret;
 
-    /**
-     * Creates and configures a Keycloak admin client bean.
-     *
-     * @return a configured {@link Keycloak} instance
-     */
     @Bean
     public Keycloak keycloakAdminClient() {
         return KeycloakBuilder.builder()

@@ -20,12 +20,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Security configuration for the Latent Nexus backend.
+ * Security configuration for the Latent Nexus backend application.
  * <p>
- * This class configures Spring Security to use Keycloak as the OpenID Connect (OIDC) provider.
- * It defines the security filter chain, stateless session management, and authorization rules
- * for different API endpoints. It also includes a custom converter to map Keycloak realm roles
- * to Spring Security {@link GrantedAuthority} objects with a "ROLE_" prefix.
+ * This class sets up Spring Security to integrate with Keycloak as an OpenID Connect (OIDC)
+ * provider, enabling robust authentication and authorization for the REST API.
+ * </p>
+ * <p>
+ * Key features configured here include:
+ * <ul>
+ *     <li>Disabling CSRF protection, as it's typically not required for stateless REST APIs.</li>
+ *     <li>Enforcing stateless session management, which is crucial for scalable, token-based authentication.</li>
+ *     <li>Defining authorization rules for API endpoints, allowing public access to health checks
+ *         and requiring authentication for all other requests.</li>
+ *     <li>Configuring OAuth2 Resource Server to process JWTs issued by Keycloak.</li>
+ *     <li>A custom {@link JwtAuthenticationConverter} that extracts Keycloak realm roles
+ *         and maps them to Spring Security's {@link GrantedAuthority} objects, prefixed with "ROLE_".
+ *         This allows for role-based access control using Spring Security's `@PreAuthorize` annotations.</li>
+ * </ul>
+ * The `@EnableMethodSecurity(prePostEnabled = true)` annotation enables method-level security,
+ * allowing fine-grained access control directly on service methods or controller endpoints.
  * </p>
  */
 @Configuration
@@ -56,9 +69,6 @@ public class SecurityConfig {
         return jwtConverter;
     }
 
-    /**
-     * Custom converter to extract realm roles from a Keycloak-issued JWT.
-     */
     static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         @SuppressWarnings("unchecked")

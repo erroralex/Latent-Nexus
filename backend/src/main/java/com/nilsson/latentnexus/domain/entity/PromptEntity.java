@@ -8,11 +8,25 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
- * Represents a prompt used for AI generation within a workspace.
+ * Represents a prompt used for AI generation within a specific workspace in the Latent Nexus system.
  * <p>
- * This entity stores the positive and negative prompts, a title for identification,
- * and the target model for which the prompt was designed. Each prompt is
- * associated with a specific {@link WorkspaceEntity}.
+ * This entity captures the details of a prompt that can be utilized by various AI models
+ * to generate content. Each prompt is uniquely identified and is always associated
+ * with a {@link WorkspaceEntity}, ensuring multi-tenancy and proper organization.
+ * </p>
+ * <p>
+ * Key attributes include:
+ * <ul>
+ *     <li>**Title:** A human-readable title for easy identification and management of the prompt.</li>
+ *     <li>**Positive Prompt:** The core textual instruction or description provided to the AI model
+ *         to guide its generation towards desired characteristics.</li>
+ *     <li>**Negative Prompt:** Optional textual instructions to guide the AI model away from
+ *         undesired characteristics or elements in the generated output.</li>
+ *     <li>**Target Model:** An optional identifier for the specific AI model or type of model
+ *         for which this prompt is optimized or intended.</li>
+ * </ul>
+ * The `workspace` field establishes a many-to-one relationship with `WorkspaceEntity`,
+ * linking the prompt to its organizational context.
  * </p>
  */
 @Entity
