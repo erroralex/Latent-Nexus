@@ -1,0 +1,79 @@
+package com.nilsson.latentnexus.service.metadata.strategy;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * Metadata extraction strategy for InvokeAI-generated images.
+ * <p>
+ * This strategy parses the structured JSON metadata block used by InvokeAI.
+ * It maps InvokeAI-specific keys (e.g., "model_name", "positive_prompt", "cfg_scale")
+ * to the application's standard metadata schema.
+ * </p>
+ */
+@Service
+public class InvokeAIStrategy implements MetadataStrategy {
+
+    private static final Logger log = LoggerFactory.getLogger(InvokeAIStrategy.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public Map<String, Object> parse(String text) {
+        if (text == null || text.isBlank()) {
+            return new HashMap<>();
+        }
+
+        Map<String, Object> results = new HashMap<>();
+        try {
+            JsonNode root = mapper.readTree(text);
+            Iterator<Map.Entry<String, JsonNode>> fields = root.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                extract(field.getKey(), field.getValue(), root, results);
+            }
+        } catch (Exception e) {
+            log.error("Failed to parse InvokeAI metadata block", e);
+            throw new RuntimeException("System failed to parse InvokeAI generation parameters from JSON block.", e);
+        }
+        return results;
+    }
+
+    @Override
+    public void extract(String key, JsonNode value, JsonNode parentNode, Map<String, Object> results) {
+        try {
+            if (!value.isTextual() && !value.isNumber()) return;
+            String text = value.asText();
+
+            if (key.equals("model_name") || key.equals("model_weights")) {
+                results.put("Model", text);
+            } else if (key.equals("positive_prompt") || (key.equals("prompt") && !results.containsKey("Prompt"))) {
+                results.put("Prompt", text);
+            } else if (key.equals("negative_prompt")) {
+                results.put("Negative", text);
+            } else if (key.equals("cfg_scale") || key.equals("cfg_rescale_multiplier")) {
+                results.put("CFG", value.isNumber() ? value.asDouble() : parseDoubleSafe(text));
+            } else if ((key.equals("sampler_name") || key.equals("scheduler")) && !results.containsKey("Sampler")) {
+                results.put("Sampler", text);
+            } else if (key.equals("variant") && !results.containsKey("Model")) {
+                results.put("Model", text);
+            }
+        } catch (Exception e) {
+            log.error("Error during InvokeAI JSON extraction for key: {}", key, e);
+        }
+    }
+
+    private Double parseDoubleSafe(String value) {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+}

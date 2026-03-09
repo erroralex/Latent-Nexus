@@ -20,7 +20,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Enterprise Security Configuration leveraging Keycloak as the OIDC provider.
+ * Security configuration for the Latent Nexus backend.
+ * <p>
+ * This class configures Spring Security to use Keycloak as the OpenID Connect (OIDC) provider.
+ * It defines the security filter chain, stateless session management, and authorization rules
+ * for different API endpoints. It also includes a custom converter to map Keycloak realm roles
+ * to Spring Security {@link GrantedAuthority} objects with a "ROLE_" prefix.
+ * </p>
  */
 @Configuration
 @EnableWebSecurity
@@ -33,9 +39,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        // Public endpoints (e.g., system health check)
                         .requestMatchers("/api/v1/system/health").permitAll()
-                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -45,10 +49,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Extracts realm roles from the JWT claim and maps them to Spring Security
-     * GrantedAuthorities with the 'ROLE_' prefix.
-     */
     @Bean
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
@@ -57,7 +57,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Converter to extract Realm Roles from Keycloak JWT.
+     * Custom converter to extract realm roles from a Keycloak-issued JWT.
      */
     static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
