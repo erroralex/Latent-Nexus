@@ -1,12 +1,11 @@
 -- V2: Initial Consolidated Enterprise Schema for Latent Nexus
--- Engineered for PostgreSQL 16+
+-- Engineered for PostgreSQL 16+ with pgvector support
 
 -------------------------------------------------------------------------------
 -- 1. EXTENSIONS
 -------------------------------------------------------------------------------
--- V4: Enable pgvector extension
-CREATE
-EXTENSION IF NOT EXISTS vector;
+-- Enable pgvector extension for semantic search
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -------------------------------------------------------------------------------
 -- 2. WORKSPACES
@@ -66,7 +65,7 @@ CREATE TABLE assets
     -- The JSONB column for ComfyUI/Stable Diffusion metadata
     generation_metadata JSONB,
 
-    -- V5: Add embedding column for semantic search
+    -- Vector embedding for semantic search (768 dimensions for Gemini)
     embedding           vector(768),
 
     CONSTRAINT fk_assets_workspace
@@ -82,6 +81,6 @@ CREATE INDEX idx_assets_workspace_id ON assets (workspace_id);
 -- This makes searching deeply nested JSON graphs instant
 CREATE INDEX idx_assets_metadata_gin ON assets USING GIN (generation_metadata);
 
--- V3: Add targeted GIN index for tag-based searches
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_assets_tags_gin
-    ON assets USING GIN ((generation_metadata->'tags'));
+-- Targeted GIN index for tag-based searches
+CREATE INDEX idx_assets_tags_gin
+    ON assets USING GIN ((generation_metadata -> 'tags'));

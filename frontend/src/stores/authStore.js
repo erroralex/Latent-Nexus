@@ -25,13 +25,19 @@ export const useAuthStore = defineStore('auth', {
                 realm: 'latent-nexus',
                 clientId: 'latent-nexus-frontend',
                 onLoad: 'login-required',
-                checkLoginIframe: false
+                checkLoginIframe: false,
+                pkceMethod: 'S256'
             };
 
             this.keycloak = new Keycloak(initOptions);
 
             try {
-                const authenticated = await this.keycloak.init(initOptions);
+                const authenticated = await this.keycloak.init({
+                    onLoad: 'login-required',
+                    checkLoginIframe: false,
+                    pkceMethod: 'S256'
+                });
+                
                 this.authenticated = authenticated;
 
                 if (authenticated) {
@@ -43,11 +49,13 @@ export const useAuthStore = defineStore('auth', {
                             if (refreshed) {
                                 this.token = this.keycloak.token;
                             }
+                        }).catch(() => {
+                            console.error('Failed to refresh token');
                         });
                     }, 60000);
                 }
             } catch (error) {
-                console.error('Keycloak initialization failed', error);
+                console.error('Keycloak initialization failed. Ensure the realm and client exist.', error);
             }
         },
 

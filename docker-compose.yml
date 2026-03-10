@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:16-alpine
+    # Use the official pgvector image which includes the extension pre-installed
+    image: pgvector/pgvector:pg16
     container_name: latent-nexus-db
     restart: unless-stopped
     environment:
@@ -21,12 +22,10 @@ services:
     container_name: latent-nexus-iam
     command: start-dev
     environment:
-      # Wire Keycloak to use our PostgreSQL container for its own storage
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/latent_nexus
       KC_DB_USERNAME: nexus_admin
       KC_DB_PASSWORD: nexus_password
-      # Bootstrap Admin User
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
@@ -41,5 +40,4 @@ networks:
     driver: bridge
 
 volumes:
-  # Named volume to ensure your database data survives container destruction
   postgres_data:
