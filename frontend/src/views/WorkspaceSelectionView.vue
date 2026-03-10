@@ -1,10 +1,5 @@
 <!--
   Workspace Selection view component.
-
-  This component allows users to choose from a list of available workspaces
-  retrieved from the backend. It handles the loading state during data
-  fetching and displays a list of workspace cards. Selecting a workspace
-  navigates the user to the corresponding asset registry view.
 -->
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -18,6 +13,7 @@ const router = useRouter();
 onMounted(async () => {
   try {
     const response = await apiClient.get('/workspaces');
+    console.log("Workspaces received from backend:", response.data);
     workspaces.value = response.data;
   } catch (error) {
     console.error("Failed to fetch workspaces", error);

@@ -29,6 +29,8 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 1
+    clean-on-validation-error: true
+    clean-disabled: false
 
   security:
     oauth2:

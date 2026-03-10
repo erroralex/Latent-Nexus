@@ -2,6 +2,8 @@ package com.nilsson.latentnexus.controller;
 
 import com.nilsson.latentnexus.domain.entity.WorkspaceEntity;
 import com.nilsson.latentnexus.service.WorkspaceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +34,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/workspaces")
 public class WorkspaceController {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkspaceController.class);
     private final WorkspaceService workspaceService;
 
     public WorkspaceController(WorkspaceService workspaceService) {
@@ -41,7 +44,9 @@ public class WorkspaceController {
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<WorkspaceEntity> getAllWorkspaces() {
-        return workspaceService.getAllWorkspaces();
+        List<WorkspaceEntity> workspaces = workspaceService.getAllWorkspaces();
+        log.info("Retrieved {} workspaces for authenticated user", workspaces.size());
+        return workspaces;
     }
 
     @PostMapping
